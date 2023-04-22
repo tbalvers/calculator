@@ -14,18 +14,14 @@ body {
     display: flex;
     flex-direction: column;
     align-items: space-around;
-    min-width: 250px;
+    min-width: 270px;
     aspect-ratio: 9/16;
     background-color: black;
     border-style: solid;
     border-width: 5px;
     border-radius: 16px;
     border-color: gray;
-    padding-bottom: 30px;
-}
-
-.display {
-    flex: 2.5 1 auto;
+    padding-bottom: 20px;
 }
 
 .row {
@@ -33,7 +29,7 @@ body {
     flex-direction: row;
     flex: auto;
     justify-content: space-between;
-    padding: 10px 20px;
+    padding: 9px 20px;
 }
 
 .column {
@@ -69,4 +65,17 @@ body {
 
 .light .text {
     color: black;
+}
+
+.display .text {
+    font-size: 45px;
+    height: 45px;
+}
+
+.display {
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+    padding: 0px 40px 15px;
+    flex: 2.5 1 auto;
 }
