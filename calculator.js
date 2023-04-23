@@ -1,6 +1,7 @@
 let numbersInCalculation = [];
 let operator;
 let displayValue = '0';
+let lastKeyPressed = '';
 
 let AC = document.querySelector('#AC');
 AC.addEventListener('click', clearDisplay);
@@ -21,20 +22,7 @@ let modulators = document.querySelectorAll('.modulator');
     })
 
 let equals = document.querySelector('#equals');
-    equals.addEventListener('click', e => {
-        if (numbersInCalculation.length === 0)
-        {
-            return;
-        }
-        else if (numbersInCalculation.length === 1)
-        {
-            numbersInCalculation.push(displayValue);
-        }
-        displayValue = operate(numbersInCalculation[0], numbersInCalculation[1], operator);
-        numbersInCalculation.shift();
-        numbersInCalculation.unshift(displayValue);
-        populateDisplay();
-    });
+    equals.addEventListener('click', equalsCalculation);
 
 let allButtons = document.querySelectorAll('.column');
     allButtons.forEach(button => {
@@ -42,8 +30,53 @@ let allButtons = document.querySelectorAll('.column');
         button.addEventListener("transitionend", removeHighlight);
     });
 
+function equalsCalculation(e) {
+    if (operator)
+    {
+    if (e && lastKeyPressed != 'equals' && numbersInCalculation.length >= 1)
+    {
+        if (displayValue != '')
+        {
+            numbersInCalculation.push(displayValue);
+        }
+        else
+        {
+            displayValue = '0';
+            populateDisplay();
+            lastKeyPressed = '';
+            numbersInCalculation = [];
+            operator = '';
+            console.log('reset');
+            return;
+        }
+    }
+    else if (e)
+    {
+        if (lastKeyPressed = 'operator')
+        {
+            return
+        }
+    }
+    
+    displayValue = operate(operator, ...numbersInCalculation);
+    numbersInCalculation.splice(0, numbersInCalculation.length - 1);
+    numbersInCalculation.unshift(displayValue);
+    console.log(numbersInCalculation);
+    if (e)
+    {
+        if (numbersInCalculation.length <= 1)
+        {
+            return;
+        }
+        populateDisplay();
+        lastKeyPressed = 'equals';
+    }
+    }
+}
+
 function clearDisplay() {
     displayValue = '0';
+    lastKeyPressed = '';
     numbersInCalculation = [];
     populateDisplay();
 }
@@ -59,19 +92,37 @@ function calculateDisplay(event) {
     }
     else if (event.target.querySelector('.text') && displayValue.length < 7)
     {
-        if (displayValue === '0')
-        {
+        if (displayValue === '0' || lastKeyPressed === 'operator' || lastKeyPressed === 'equals')
+        {           
+            if (lastKeyPressed === 'equals')
+            {
+                displayValue = '0';
+                populateDisplay();
+                lastKeyPressed = '';
+                numbersInCalculation = [];
+                operator = '';
+                console.log('reset');
+            }
             displayValue = event.target.querySelector('.text').textContent;
         }
         else
         {
-            displayValue += event.target.querySelector('.text').textContent;
+            displayValue += event.target.querySelector('.text').textContent; 
         } 
     }
     else if (displayValue.length < 7)
     {
-        if (displayValue === '0')
+        if (displayValue === '0' || lastKeyPressed === 'operator' || lastKeyPressed === 'equals')
         {
+            if (lastKeyPressed === 'equals')
+            {
+                displayValue = '0';
+                populateDisplay();
+                lastKeyPressed = '';
+                numbersInCalculation = [];
+                operator = '';
+                console.log('reset');
+            }
             displayValue = event.target.textContent;
         }
         else
@@ -79,13 +130,7 @@ function calculateDisplay(event) {
             displayValue += event.target.textContent;
         }
     }
-
-    else if (numbersInCalculation.length >= 2)
-    {
-        clearDisplay(); 
-        displayValue = event.target.textContent;
-    }
-
+    lastKeyPressed = 'number';
     populateDisplay();
 }
 
@@ -94,43 +139,130 @@ function populateDisplay() {
     display.textContent = `${displayValue}`;
 }
 
-function add(number1, number2) {
-    return Number(number1) + Number(number2);
+function add() {
+    total = Number(arguments[0])
+    for (let i = 1; i < arguments.length; i++)
+    {
+        total += Number(arguments[i])
+    }
+    if (typeof(total) === 'string')
+    {
+        return total;
+    }
+    else if (typeof(total) === 'number')
+    {
+        return total.toString();
+    }
+    else
+    {
+        return displayValue;
+    }
 }
 
-function subtract(number1, number2) {
-    return number1 - number2;
+function subtract() {
+    total = arguments[0]
+    for (let i = 1; i < arguments.length; i++)
+    {
+        total -= arguments[i]
+    }
+    if (typeof(total) === 'string')
+    {
+        return total;
+    }
+    else if (typeof(total) === 'number')
+    {
+        return total.toString();
+    }
+    else
+    {
+        return displayValue;
+    }
 }
 
-function divide(number1, number2) {
-    return number1 / number2;
+function divide() {
+    total = arguments[0]
+    for (let i = 1; i < arguments.length; i++)
+    {
+        total /= arguments[i]
+    }
+    if (typeof(total) === 'string')
+    {
+        return total;
+    }
+    else if (typeof(total) === 'number')
+    {
+        return total.toString();
+    }
+    else
+    {
+        return displayValue;
+    }
 }
 
-function multiply(number1, number2) {
-    return number1 * number2;
+function multiply() {
+    total = arguments[0]
+    for (let i = 1; i < arguments.length; i++)
+    {
+        total *= arguments[i]
+    }
+    if (typeof(total) === 'string')
+    {
+        return total;
+    }
+    else if (typeof(total) === 'number')
+    {
+        return total.toString();
+    }
+    else
+    {
+        return displayValue;
+    }
 }
 
-function operate(number1, number2, operator)
+function operate(operator, ...numbers)
 {
     if (operator === "add")
     {
-        return add(number1, number2);
+        return add(...numbers);
     }
     else if (operator === "subtract")
     {
-        return subtract(number1, number2);
+        return subtract(...numbers);
     }
     else if (operator === "multiply")
     {
-        return multiply(number1, number2);
+        return multiply(...numbers);
     }
     else if (operator === "divide")
     {
-        return divide(number1, number2);
+        return divide(...numbers);
     }
 }
 
 function getOperator(e) {
+    if (displayValue != '')
+    {
+        numbersInCalculation.push(displayValue);
+    }
+    console.log(numbersInCalculation);
+    if (numbersInCalculation.length >= 2)
+    {
+        if (lastKeyPressed != 'equals')
+        {
+            equalsCalculation();
+        }
+        if (lastKeyPressed === 'equals')
+        {
+            numbersInCalculation.pop();
+        }
+        populateDisplay();
+        numbersInCalculation.pop();
+        console.log(numbersInCalculation);
+    }
+    else
+    {
+        displayValue = '';
+    }
     switch (e.target.id) {
         case 'plus':
         operator = 'add'
@@ -164,16 +296,9 @@ function getOperator(e) {
         operator = 'divide'
         break;
     }
-    if (numbersInCalculation.length === 0)
-    {
-        numbersInCalculation.push(displayValue);
-    }
-    else if (numbersInCalculation.length === 2)
-    {
-        numbersInCalculation = numbersInCalculation.slice(0,1);
-    }
-    displayValue = '';
-    return operator;
+    lastKeyPressed = 'operator'
+    console.log(operator)
+        return operator;
 }
 
 function addHighlight(e) {
@@ -199,6 +324,10 @@ function removeHighlight(e) {
 }
 
 function enactModulator(e) {
+    if (lastKeyPressed != 'number')
+    {
+        return;
+    }
     if (e.target.textContent.includes('%'))
     {
         displayValue = displayValue * 0.01;
